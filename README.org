@@ -39,6 +39,8 @@ To set display back to normal:
 redshift normal
 #+end_src
 
+If at the middle of the day BLUE is too active you can decrease it with increasing value of TOO_MUCH_BLUE, same for red.
+
 * Automatic activation
 You can activate command when you do other frequently used commands:
 #+begin_src bash
