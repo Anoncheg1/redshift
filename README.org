@@ -14,6 +14,13 @@ This script have code to calculate middle of the day and middle of the
  night and percentage of sun rising and sunset. You can use it for
  Salat or Namaz calculation for Muslims or something like that.
 
+* Requirements
+This script depends on xranr https://www.x.org/wiki/Projects/XRandR/
+
+Check that xrandr exist at PATH:
+#+begin_src bash
+xrandr
+#+end_src
 * Usage
 First set variables R and S inside of the script https://github.com/Anoncheg1/redshift/blob/main/redshift.sh#L384 . This is time of raising
  and sunset. You can get this values at internet according to your

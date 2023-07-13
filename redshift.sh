@@ -1,5 +1,10 @@
 #!/usr/bin/env bash
 
+# require https://www.x.org/wiki/Projects/XRandR/
+# 1) set R and S values
+# 2) exec do_redshift
+# 3) or exec redshift 0-100 or normal
+
 # https://github.com/jonls/redshift/blob/master/src/colorramp.c
 # https://github.com/jonls/redshift/blob/master/README-colorramp
 # Ingo Thies, 2013
@@ -386,7 +391,7 @@ declare -i S=21 # SUNSET
 
 do_redshift() {
     h=$(date +%k) # get current hour
-    # h=$(TZ="Europe/Paris" date +%k) # variant with timezone
+    # h=$(TZ="Europe/Moscow" date +%k) # variant with timezone
     calc_redshift $R $S $h # calculate percentage of RED-BLUE according to time to "p" variable
     redshift $p # adjust screen
 
