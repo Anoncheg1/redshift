@@ -15,7 +15,7 @@ This script have code to calculate middle of the day and middle of the
  Salat or Namaz calculation for Muslims or something like that.
 
 * Usage
-First set variables R and S inside of script. This is time of raising
+First set variables R and S inside of the script https://github.com/Anoncheg1/redshift/blob/main/redshift.sh#L384 . This is time of raising
  and sunset. You can get this values at internet according to your
  region and season.
 
