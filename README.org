@@ -1,0 +1,62 @@
+* Description
+Change screen from red to blue according to current time or manually.
+
+The idea was taken from https://github.com/jonls/redshift/ but not to
+ help eyes, but as experiment to make body understand current time.
+
+This is simple bash script that get current time and set your screen
+ more red or blue according to current time.
+
+This script uses "colorramp" from Redshift of jonls, which is Ingo
+ Thies, 2013.
+
+This script have code to calculate middle of the day and middle of the
+ night and percentage of sun rising and sunset. You can use it for
+ Salat or Namaz calculation for Muslims or something like that.
+
+* Usage
+First set variables R and S inside of script. This is time of raising
+ and sunset. You can get this values at internet according to your
+ region and season.
+
+Second you should execute script to shell:
+#+begin_src bash
+source /home/user/git_cloned_sources/redshift/redshift.sh
+#+end_src
+
+Then call following command to get time and adjust screen:
+#+begin_src bash
+do_redshift
+#+end_src
+
+To set RED-BLUE manually call following command with value between 0 and 100
+#+begin_src bash
+redshift 99
+#+end_src
+
+To set display back to normal:
+#+begin_src bash
+redshift normal
+#+end_src
+
+* Automatic activation
+You can activate command when you do other frequently used commands:
+#+begin_src bash
+alias ls="do_redshift ; ls"
+#+end_src
+
+Or create process when you first open Bash, add this lines to *~/.bashrc* file:
+#+begin_src bash
+ra=$(ps aux | grep 'watch -n' | wc -l)
+if [ $ra -eq 1 ] ; then
+    source /home/user/git_cloned_sources/redshift/redshift.sh
+    watch -n $((60*60)) do_redshift >/dev/null &
+fi
+#+end_src
+
+Or add command to *Cron* daemon with hour period:
+#+begin_src bash
+sudo cron -e
+# and add this line:
+0 * * * * source /home/user/git_cloned_sources/redshift/redshift.sh ; do_redshift >/dev/null
+#+end_src
