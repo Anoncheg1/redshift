@@ -50,7 +50,7 @@ Or create process when you first open Bash, add this lines to *~/.bashrc* file:
 ra=$(ps aux | grep 'watch -n' | wc -l)
 if [ $ra -eq 1 ] ; then
     source /home/user/git_cloned_sources/redshift/redshift.sh
-    watch -n $((60*60)) do_redshift >/dev/null &
+    watch -n $((60*60)) "$(do_redshift)" >/dev/null &
 fi
 #+end_src
 
