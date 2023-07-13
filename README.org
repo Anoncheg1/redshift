@@ -4,7 +4,7 @@ Change screen from red to blue according to current time or manually.
 The idea was taken from https://github.com/jonls/redshift/ but not to
  help eyes, but as an experiment to make body understand current time.
 
-This is simple bash script that get current time and set your screen
+This is a simple bash script that get current time and set your screen
  more red or blue according to current time.
 
 This script uses "colorramp" from Redshift of jonls, which is Ingo
