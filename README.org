@@ -1,5 +1,5 @@
 * Description
-Change screen from red to blue according to current time or manually.
+Change screen from red to blue according to current time or manually. At the middle of the day it makes screen blue and at the middle of the night red.
 
 The idea was taken from https://github.com/jonls/redshift/ but not to
  help eyes, but as an experiment to make body understand current time.
