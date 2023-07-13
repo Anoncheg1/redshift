@@ -386,7 +386,7 @@ test_calc_redshift() {
 declare -ri TOO_MUCH_RED=1 # remove edge values if they are too red or too blue
 declare -ri TOO_MUCH_BLUE=30 # remove edge values if they are too red or too blue # max 242 for sum
 # must be: R < S
-declare -i R=4 # RAISING
+declare -i R=4 # ARAISE
 declare -i S=21 # SUNSET
 
 do_redshift() {
