@@ -385,8 +385,8 @@ declare -i R=4 # RAISING
 declare -i S=21 # SUNSET
 
 do_redshift() {
-    h=$(date +%H) # get current hour
-    # h=$(TZ="Europe/Paris" date +%H) # variant with timezone
+    h=$(date +%k) # get current hour
+    # h=$(TZ="Europe/Paris" date +%k) # variant with timezone
     calc_redshift $R $S $h # calculate percentage of RED-BLUE according to time to "p" variable
     redshift $p # adjust screen
 
