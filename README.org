@@ -14,7 +14,7 @@ This script have code to calculate middle of the day and middle of the
  night and percentage of sun rising and sunset. You can use it for
  Salat or Namaz calculation for Muslims or something like that.
 
-This script don't change brightness but it degradate date at high blue and red.
+This script don't change brightness but it is degrading at high blue and red.
 
 * Requirements
 This script depends on xranr https://www.x.org/wiki/Projects/XRandR/
