@@ -282,20 +282,20 @@ calc_redshift() { # (R, S, h) # R < S
 
     RS=$(( (($S - $R) / 2) + $R )) # middle of day
     SR=$(( (24 - $S + $R) / 2 + $S )) # middle of night
-    if [[ $SR -gt 24 ]] ; then SR=$(( $SR - 24 )) ; fi # SR > 24
+    if [[ $SR -ge 24 ]] ; then SR=$(( $SR - 24 )) ; fi # SR > 24
     # echo RS $RS
     # echo SR $SR
 
     # ------ sunset or raising?
     # is_sunset=0 #? 1=RS SR, 0 = SR RS
     if [[ $RS -lt $SR ]]; then # RS < SR # RS_mday=12, SR_mnight=22
-        if [ $RS -lt $h ] && [ $h -lt $SR ]; then # RS < h < SR # RS_mday=12, SR_mnight=22, h=13
+        if [ $RS -le $h ] && [ $h -lt $SR ]; then # RS < h < SR # RS_mday=12, SR_mnight=22, h=13
             is_sunset=1
         else # RS_mday=12, SR_mnight=22, h=23 or h=1
             is_sunset=0
         fi
     elif [[ $RS -gt $SR ]]; then # RS > $SR # SR_mnight=2, RS_mday=12
-        if [ $RS -gt $h ] && [ $h -gt $SR ]; then # RS > h > SR # SR_mnight=2, RS_mday=12, h=3
+        if [ $RS -ge $h ] && [ $h -gt $SR ]; then # RS > h > SR # SR_mnight=2, RS_mday=12, h=3
             is_sunset=0
         else # SR_mnight=2, RS_mday=12, h=14 or h=1
             is_sunset=1
@@ -319,6 +319,14 @@ calc_redshift() { # (R, S, h) # R < S
         local -r sub=$1; shift
         hsub=$(($h - $sub))
         if [ $h -lt 0 ] ; then hsub=$((24 + $hsub)) ; fi
+        echo $hsub
+    }
+
+    add_h() { # (h, add) -> hadd
+        local -r h=$1;  shift
+        local -r add=$1; shift
+        hsub=$(($h + $add))
+        if [ $h -gt 23 ] ; then hsub=$((24 + $hsub)) ; fi
         echo $hsub
     }
 
@@ -382,38 +390,43 @@ test_calc_redshift() {
     # echo s_range=$s_range
     # echo p=$p
 
+    echo calc_redshift 4 21 1
     calc_redshift 4 21 1
     assert RS $RS 12
-    assert SR $SR 24
+    assert SR $SR 0
     assert hm $hm 1
     assert is_sunset $is_sunset 0
     assert r_range $r_range 12
     assert p $p 8
 
+    echo calc_redshift 4 21 4
     calc_redshift 4 21 4
     assert RS $RS 12
-    assert SR $SR 24
+    assert SR $SR 0
     assert hm $hm 4
     assert is_sunset $is_sunset 0
     assert r_range $r_range 12
     assert p $p 33
 
+    echo calc_redshift 4 21 12
     calc_redshift 4 21 12
     assert RS $RS 12
-    assert SR $SR 24
+    assert SR $SR 0
     assert hm $hm 12
     assert is_sunset $is_sunset 0
     assert r_range $r_range 12
     assert p $p 100
 
+    echo calc_redshift 4 21 20
     calc_redshift 4 21 20
     assert RS $RS 12
-    assert SR $SR 24
+    assert SR $SR 0
     assert hm $hm 8
     assert is_sunset $is_sunset 1
     assert s_range $s_range 12
     assert p $p 34
 
+    echo calc_redshift 6 20 20
     calc_redshift 6 20 20
     assert RS $RS 13
     assert SR $SR 1
