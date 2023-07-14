@@ -55,7 +55,7 @@ Check that xrandr exist at PATH:
 xrandr
 #+end_src
 * Usage
-First set variables R and S inside of the script https://github.com/Anoncheg1/redshift/blob/main/redshift.sh#L384 . This is time of raising
+First set variables R and S inside of the script https://github.com/Anoncheg1/redshift/blob/main/redshift.sh#586 . This is time of raising
  and sunset. You can get this values at internet according to your
  region and season.
 
