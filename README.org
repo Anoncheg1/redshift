@@ -9,6 +9,8 @@ It takes arise and sunset time and calc middle of the day. Then calc
 At the middle of the day it makes screen blue and at the middle of the
  night red.
 
+If there is a gap in day or night, then in this gap temperature stay fixed.
+
 The idea was taken from https://github.com/jonls/redshift/ but not to
  help eyes, but as an experiment to make body understand current time.
 
@@ -23,6 +25,26 @@ This script have code to calculate middle of the day and middle of the
  Salat or Namaz calculation for Muslims or something like that.
 
 This script don't change brightness but it is degrading at high blue and red.
+
+#+begin_src artist
+                  Ninght gap = 10 hours - full RED temperature
+         sunset      23  00
+          21      x----------    arise 4 AM
+              ---/           \--X-
+            -X                  --X
+           /  --\             -/   \
+          /      -\        --/      \
+         /         --\   -/          \
+ temper. |            -o/            | temperature change from RED to BLUE
+ change  \             |\            /
+ from     \           / |           /
+  RED      \          |  \         /
+   to       -\        |  |       /-
+   BLUE       ---\   /    \  /---
+                  ---+----+--
+                       12
+                   day gap = 2 hours - full BLUE
+#+end_src
 
 * Requirements
 This script depends on xranr https://www.x.org/wiki/Projects/XRandR/
@@ -55,6 +77,12 @@ To set display back to normal:
 #+begin_src bash
 redshift normal
 #+end_src
+
+To test full circle use command:
+#+begin_src bash
+test_do_redshift
+#+end_src
+
 
 If at the middle of the day BLUE is too active you can decrease it with increasing value of TOO_MUCH_BLUE, same for red.
 
