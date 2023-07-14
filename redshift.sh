@@ -1,5 +1,12 @@
 #!/usr/bin/env bash
 
+set -u # Report Non-Existent Variables
+set -E
+# set -e # It terminates the execution when the error occurs. (does not work with piped commands. use Set -eo pipefail)
+# set -o pipefail # exit execution if one of the commands in the pipe fails.
+# set -x # write to standard error a trace for each  command
+# set -n # do not execute only check syntax
+
 # require https://www.x.org/wiki/Projects/XRandR/
 # 1) set R and S values
 # 2) exec do_redshift
@@ -253,6 +260,7 @@ declare -ar blackbody_color=( # temperature from hot to cool
 	0.62740336:0.75282962:1.00000000 # /* 25100K */
 )
 
+# ------ help functions
 assert() {
     if ! [[ "$2" =~ ^[0-9]+$ ]]; then echo Error $1 not integer: 2 ; fi
     if ! [[ "$3" =~ ^[0-9]+$ ]]; then echo Error $1 not integer: 3 ; fi
@@ -260,6 +268,24 @@ assert() {
     [ $2 -ne $3 ] && echo "Error $1 $2 != $3" ;
 }
 
+sub_h() { # (h, sub) -> hsub
+    local -r h=$1;  shift
+    local -r sub=$1; shift
+    hsub=$(($h - $sub))
+    if [ $hsub -lt 0 ] ; then hsub=$((24 + $hsub)) ; fi
+    echo $hsub
+}
+
+add_h() { # (h, add) -> hadd
+    local -r h=$1;  shift
+    local -r add=$1; shift
+    hadd=$(($h + $add))
+    if [ $hadd -gt 23 ] ; then hadd=$(($hadd - 24)) ; fi
+    echo $hadd
+}
+
+
+# ------ important functions
 
 redshift() { # change temperature, uses TOO_MUCH value
     local display_xrandr=$(xrandr | grep " connected" | head -n 1 | cut -d ' ' -f1) # LVDS1
@@ -314,30 +340,12 @@ calc_redshift() { # (R, S, h) # R < S
     # RS=1
     # SR=8
 
-    sub_h() { # (h, sub) -> hsub
-        local -r h=$1;  shift
-        local -r sub=$1; shift
-        hsub=$(($h - $sub))
-        if [ $h -lt 0 ] ; then hsub=$((24 + $hsub)) ; fi
-        echo $hsub
-    }
-
-    add_h() { # (h, add) -> hadd
-        local -r h=$1;  shift
-        local -r add=$1; shift
-        hsub=$(($h + $add))
-        if [ $h -gt 23 ] ; then hsub=$((24 + $hsub)) ; fi
-        echo $hsub
-    }
-
     rs_low=$(sub_h $RS $RS_gap_part1)
     rs_high=$(sub_h $RS $RS_gap_part2)
     sr_low=$(sub_h $SR $SR_gap_part1)
     sr_high=$(sub_h $SR $SR_gap_part2)
 
     # R->rs_low->rs_high->S->sr_low->sr_high->R
-
-
 
     # --------------- two ranges and current hour in range
     if [ $is_sunset -eq 1 ] ; then
@@ -380,6 +388,7 @@ calc_redshift() { # (R, S, h) # R < S
     # echo $p
 }
 
+
 test_calc_redshift() {
     # calc_redshift 6 20 20
     # echo RS=$RS
@@ -389,6 +398,14 @@ test_calc_redshift() {
     # echo r_range=$r_range
     # echo s_range=$s_range
     # echo p=$p
+
+    echo sub_h 2 23
+    sub_hr=$(sub_h 2 23)
+    assert sub_hr $sub_hr 3
+
+    echo add_h 23 23
+    add_hr=$(add_h 23 23)
+    assert add_hr $add_hr 22
 
     echo calc_redshift 4 21 1
     calc_redshift 4 21 1
@@ -436,10 +453,10 @@ test_calc_redshift() {
     assert p $p 42
 }
 
+
 # ----------- MAIN -----------
 
-
-declare -ri TOO_MUCH_RED=1 # remove edge values if they are too red or too blue
+declare -ri TOO_MUCH_RED=1  # remove edge values if they are too red or too blue
 declare -ri TOO_MUCH_BLUE=30 # remove edge values if they are too red or too blue # max 242 for sum
 # must be: R < S
 declare -i R=4 # ARAISE
