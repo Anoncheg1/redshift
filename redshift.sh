@@ -341,13 +341,108 @@ calc_redshift() { # (R, S, h) # R < S
     # SR=8
 
     rs_low=$(sub_h $RS $RS_gap_part1)
-    rs_high=$(sub_h $RS $RS_gap_part2)
+    rs_high=$(add_h $RS $RS_gap_part2)
     sr_low=$(sub_h $SR $SR_gap_part1)
-    sr_high=$(sub_h $SR $SR_gap_part2)
+    sr_high=$(add_h $SR $SR_gap_part2)
+    echo RS $RS
+    echo SR $SR
+    echo rs_low $rs_low
+    echo rs_high $rs_high
+    echo sr_low $sr_low
+    echo sr_high $sr_high
 
     # R->rs_low->rs_high->S->sr_low->sr_high->R
+    #
+    # is_sunset=1 : rs_high->h->sr_low or in gap_rs or gap_sr
+    # is_sunset=0 : sr_high->h->rs_low or in gap_rs or gap_sr
+    # gap_rs : rs_low->h->rs_high
+    # gap_sr : sr_low->h->sr_high
+
+    # 11->15->23->3 (3 is sr_hight)
+    # we assume that sr_high may < sr_low # middle of the night
+    # or sr_low < rs_low # night after 00:00
 
     # --------------- two ranges and current hour in range
+    if [ $sr_high -lt $sr_low ] ; then
+        # -- sr_high after 00:00
+
+        if [ $is_sunset -eq 1 ] ; then
+            if [ $rs_high -le $h ] && [ $h -lt $sr_low ]; then # rs_high > h > sr_low
+                hm=$(( $h - $rs_high ))
+            elif [ $rs_low -le $h ] && [ $h -lt $rs_high ]; then # gap_rs
+                hm=0
+            else # gap_sr
+                hm=$(( $rs_high - $sr_low ))
+            fi
+            range=$(( $rs_high - $sr_low ))
+        else # is_sunset == 0
+            # sr_high->h->rs_low or in gap_rs or gap_sr
+            if [ $sr_high -le $h ] && [ $h -lt $rs_low ]; then # sr_high > h > rs_low
+                hm=$(( $h - $sr_high ))
+            elif [ $rs_low -le $h ] && [ $h -lt $rs_high ]; then # gap_rs
+                hm=0
+            else # gap_sr
+                hm=$(( $sr_high - $rs_low ))
+            fi
+            range=$(( $sr_high - $rs_low ))
+        fi
+
+    elif [ $sr_low -lt $rs_low ]; then
+        # -- night after 00:00 - both sr_low and sr_high after 00:00
+
+        if [ $is_sunset -eq 1 ] ; then
+            if [ $rs_high -le $h ]; then
+                hm=$(( $h - $rs_high ))
+            elif [ $h -lt $sr_low ]; then # rs_high > h > sr_low
+                hm=$(( 24 - $rs_high + $h ))
+            elif [ $rs_low -le $h ] && [ $h -lt $rs_high ]; then # gap_rs
+                hm=0
+            else # gap_sr
+                hm=$(( 24 - $rs_high + $sr_low ))
+            fi
+            range=$(( 24 - $rs_high + $sr_low ))
+        else # is_sunset == 0
+            if [ $sr_high -le $h ] && [ $h -lt $rs_low ]; then # sr_high > h > rs_low
+                hm=$(( $h - $sr_high ))
+            elif [ $rs_low -le $h ] && [ $h -lt $rs_high ]; then # gap_rs
+                hm=0
+            else # gap_sr
+                hm=$(( $sr_high - $rs_low ))
+            fi
+            range=$(( $sr_high - $rs_low ))
+        fi
+    else
+        # -- normal (middle of the night before 00:00 sr_low and sr_high)
+
+        if [ $is_sunset -eq 1 ] ; then
+            if [ $rs_high -le $h ] && [ $h -lt $sr_low ]; then # rs_high > h > sr_low
+                hm=$(( $h - $rs_high ))
+            elif [ $rs_low -le $h ] && [ $h -lt $rs_high ]; then # gap_rs
+                hm=0
+            else # gap_sr
+                hm=$(( $rs_high - $sr_low ))
+            fi
+            range=$(( $rs_high - $sr_low ))
+        else # is_sunset == 0
+            # R->rs_low->rs_high->S->sr_low->sr_high->R
+            # sr_high->h->rs_low or in gap_rs or gap_sr
+            if [ $sr_high -le $h ]; then
+                hm=$(( $h - $sr_high ))
+            elif [ $h -lt $rs_low ]; then
+                hm=$(( 24 - $sr_high + $h ))
+            elif [ $rs_low -le $h ] && [ $h -lt $rs_high ]; then # gap_rs
+                hm=0
+            else # gap_sr
+                hm=$(( 24 - $sr_high + $rs_low ))
+            fi
+            range=$(( 24 - $sr_high + $rs_low ))
+        fi
+    fi
+
+
+
+
+    # -- old
     if [ $is_sunset -eq 1 ] ; then
         if [[ $RS -lt $SR ]]; then # RS < h < SR # RS_mday=12, SR_mnight=22, h=13
             # echo SR - RS $SR - $RS
