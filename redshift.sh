@@ -594,15 +594,6 @@ do_redshift() {
     # h=$(TZ="Europe/Parish" date +%k) # variant with timezone
     calc_redshift $R $S $h $day_gap $night_gap # calculate percentage of RED-BLUE according to time to "p" variable
     redshift $p # adjust screen
-
-    # --- info about redshift, you can comment or delete it
-    echo RS=$RS
-    echo SR=$SR
-    echo hm=$hm
-    echo is_sunset=$is_sunset
-    echo r_range=$r_range
-    echo s_range=$s_range
-    echo p=$p
 }
 
 
@@ -611,6 +602,21 @@ test_do_redshift() {
         echo h $h
         calc_redshift $R $S $h $day_gap $night_gap # calculate percentage of RED-BLUE according to time to "p" variable
         redshift $p # adjust screen
+
+        # --- info about redshift, you can comment or delete it
+        echo RS=$RS
+        echo SR=$SR
+        echo rs_low $rs_low
+        echo rs_high $rs_high
+        echo sr_low $sr_low
+        echo sr_high $sr_high
+        echo is_sunset $is_sunset
+        echo hm=$hm
+        echo is_sunset=$is_sunset
+        echo range=$range
+        echo p=$p
+
         sleep 1
+
     done
 }
