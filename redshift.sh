@@ -253,6 +253,14 @@ declare -ar blackbody_color=( # temperature from hot to cool
 	0.62740336:0.75282962:1.00000000 # /* 25100K */
 )
 
+assert() {
+    if ! [[ "$2" =~ ^[0-9]+$ ]]; then echo Error $1 not integer: 2 ; fi
+    if ! [[ "$3" =~ ^[0-9]+$ ]]; then echo Error $1 not integer: 3 ; fi
+    # echo $1
+    [ $2 -ne $3 ] && echo "Error $1 $2 != $3" ;
+}
+
+
 redshift() { # change temperature, uses TOO_MUCH value
     local display_xrandr=$(xrandr | grep " connected" | head -n 1 | cut -d ' ' -f1) # LVDS1
     if [ "$1" == "normal" ] ; then xrandr --output $display_xrandr --gamma 1:1:1 ; echo Back to normal. ; return ; fi
@@ -277,40 +285,6 @@ calc_redshift() { # (R, S, h) # R < S
     if [[ $SR -gt 24 ]] ; then SR=$(( $SR - 24 )) ; fi # SR > 24
     # echo RS $RS
     # echo SR $SR
-
-    # ------ sunset or raising?
-    # is_sunset=0 #? 1=RS SR, 0 = SR RS
-    # if [[ $RS -lt $SR ]]; then # RS < SR # RS_mday=12, SR_mnight=22
-    #     if [ $RS -lt $h ] && [ $h -lt $SR ]; then # RS < h < SR # RS_mday=12, SR_mnight=22, h=13
-    #         is_sunset=1
-    #         # echo SR - RS $SR - $RS
-    #         s_range=$(( $SR - $RS ))
-    #         hm=$(( $h - $RS ))
-    #     else # RS_mday=12, SR_mnight=22, h=23 or h=1
-    #         is_sunset=0
-    #         r_range=$(( $RS + (24 - $SR) ))
-    #         if [[ $h -gt $SR ]]; then # h > SR # h=23
-    #             hm=$(( $h - $SR ))
-    #         else # h=1
-    #             hm=$(( (24 - $SR) + $h ))
-    #         fi
-    #     fi
-    # elif [[ $RS -gt $SR ]]; then # RS > $SR # SR_mnight=2, RS_mday=12
-    #     if [ $RS -gt $h ] && [ $h -gt $SR ]; then # RS > h > SR # SR_mnight=2, RS_mday=12, h=3
-    #         is_sunset=0
-    #         r_range=$(( $RS - $SR ))
-    #         hm=$(( $h - $SR ))
-    #     else # SR_mnight=2, RS_mday=12, h=14 or h=1
-    #         is_sunset=1
-    #         # echo SR + 24 - RS $SR + 24 - $RS
-    #         s_range=$(( $SR + (24 - $RS) ))
-    #         if [[ $h -gt $RS ]]; then # h > RS # h=14
-    #             hm=$(( $h - $RS ))
-    #         else # h=1
-    #             hm=$(( (24 - $RS) + $h ))
-    #         fi
-    #     fi
-    # fi
 
     # ------ sunset or raising?
     # is_sunset=0 #? 1=RS SR, 0 = SR RS
@@ -382,12 +356,6 @@ calc_redshift() { # (R, S, h) # R < S
 }
 
 test_calc_redshift() {
-    assert() {
-        if ! [[ "$2" =~ ^[0-9]+$ ]]; then echo Error $1 not integer: 2 ; fi
-        if ! [[ "$3" =~ ^[0-9]+$ ]]; then echo Error $1 not integer: 3 ; fi
-        # echo $1
-        [ $2 -ne $3 ] && echo "Error $1 $2 != $3" ;
-    }
     # calc_redshift 6 20 20
     # echo RS=$RS
     # echo SR=$SR
