@@ -303,6 +303,34 @@ calc_redshift() { # (R, S, h) # R < S
     fi
     # is_sunset
 
+
+    RS_gap=4 # blue gap
+    SR_gap=4 # red gap
+    RS_gap_part1=$(($RS_gap / 2))
+    RS_gap_part2=$(($RS_gap_part1 + $RS_gap % 2 ))
+    SR_gap_part1=$(($SR_gap / 2))
+    SR_gap_part2=$(($SR_gap / 2 + $RS_gap % 2 ))
+
+    # RS=1
+    # SR=8
+
+    sub_h() { # (h, sub) -> hsub
+        local -r h=$1;  shift
+        local -r sub=$1; shift
+        hsub=$(($h - $sub))
+        if [ $h -lt 0 ] ; then hsub=$((24 + $hsub)) ; fi
+        echo $hsub
+    }
+
+    rs_low=$(sub_h $RS $RS_gap_part1)
+    rs_high=$(sub_h $RS $RS_gap_part2)
+    sr_low=$(sub_h $SR $SR_gap_part1)
+    sr_high=$(sub_h $SR $SR_gap_part2)
+
+    # R->rs_low->rs_high->S->sr_low->sr_high->R
+
+
+
     # --------------- two ranges and current hour in range
     if [ $is_sunset -eq 1 ] ; then
         if [[ $RS -lt $SR ]]; then # RS < h < SR # RS_mday=12, SR_mnight=22, h=13
@@ -330,17 +358,6 @@ calc_redshift() { # (R, S, h) # R < S
             fi
         fi
     fi
-
-
-
-
-
-
-
-
-
-
-
 
 
     # echo is_sunset $is_sunset
