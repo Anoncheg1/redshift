@@ -35,8 +35,8 @@ This script don't change brightness but it is degrading at high blue and red.
            /  --\             -/   \
           /      -\        --/      \
          /         --\   -/          \
- temper. |            -o/            | temperature change from RED to BLUE
- change  \             |\            /
+ temper. |            -o/            | temperature change
+ change  \             |\            /  from RED to BLUE
  from     \           / |           /
   RED      \          |  \         /
    to       -\        |  |       /-
