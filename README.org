@@ -39,9 +39,9 @@ This script don't change brightness but it is degrading at high blue and red.
  temper. |            -o/            | temperature change
  change  \             |\            /  from RED to BLUE
  from     \           / |           /
-  RED      \          |  \         /
+  BLUE     \          |  \         /
    to       -\        |  |       /-
-   BLUE       ---\   /    \  /---
+   RED        ---\   /    \  /---
                   ---+----+--
                        12
                    day gap = 2 hours - full BLUE
