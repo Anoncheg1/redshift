@@ -373,7 +373,7 @@ calc_redshift() { # (R, S, h) # R < S
         if [ $is_sunset -eq 1 ] ; then
             if [ $rs_high -le $h ] && [ $h -lt $sr_low ]; then # rs_high > h > sr_low
                 hm=$(( $h - $rs_high ))
-            elif [ $rs_low -le $h ] && [ $h -lt $rs_high ]; then # gap_rs
+            elif [ $rs_low -le $h ] && [ $h -le $rs_high ]; then # gap_rs
                 hm=0
             else # gap_sr
                 hm=$(( $sr_low - $rs_high))
@@ -382,10 +382,10 @@ calc_redshift() { # (R, S, h) # R < S
         else # is_sunset == 0
             if [ $sr_high -le $h ] && [ $h -lt $rs_low ]; then # sr_high > h > rs_low
                 hm=$(( $h - $sr_high ))
-            elif [ $rs_low -le $h ] && [ $h -lt $rs_high ]; then # gap_rs
-                hm=0
-            else # gap_sr
+            elif [ $rs_low -le $h ] && [ $h -le $rs_high ]; then # gap_rs
                 hm=$(( $rs_low - $sr_high ))
+            else # gap_sr
+                hm=0
             fi
             range=$(( $rs_low - $sr_high ))
         fi
@@ -398,7 +398,7 @@ calc_redshift() { # (R, S, h) # R < S
                 hm=$(( $h - $rs_high ))
             elif [ $h -lt $sr_low ]; then # rs_high > h > sr_low
                 hm=$(( 24 - $rs_high + $h ))
-            elif [ $rs_low -le $h ] && [ $h -lt $rs_high ]; then # gap_rs
+            elif [ $rs_low -le $h ] && [ $h -le $rs_high ]; then # gap_rs
                 hm=0
             else # gap_sr
                 hm=$(( 24 - $rs_high + $sr_low ))
@@ -407,10 +407,10 @@ calc_redshift() { # (R, S, h) # R < S
         else # is_sunset == 0
             if [ $sr_high -le $h ] && [ $h -lt $rs_low ]; then # sr_high > h > rs_low
                 hm=$(( $h - $sr_high ))
-            elif [ $rs_low -le $h ] && [ $h -lt $rs_high ]; then # gap_rs
-                hm=0
-            else # gap_sr
+            elif [ $rs_low -le $h ] && [ $h -le $rs_high ]; then # gap_rs
                 hm=$(( $rs_low - $sr_high ))
+            else # gap_sr
+                hm=0
             fi
             range=$(( $rs_low - $sr_high  ))
         fi
@@ -420,7 +420,7 @@ calc_redshift() { # (R, S, h) # R < S
         if [ $is_sunset -eq 1 ] ; then
             if [ $rs_high -le $h ] && [ $h -lt $sr_low ]; then # rs_high > h > sr_low
                 hm=$(( $h - $rs_high ))
-            elif [ $rs_low -le $h ] && [ $h -lt $rs_high ]; then # gap_rs
+            elif [ $rs_low -le $h ] && [ $h -le $rs_high ]; then # gap_rs
                 hm=0
             else # gap_sr
                 hm=$(( $rs_high - $sr_low ))
@@ -433,10 +433,10 @@ calc_redshift() { # (R, S, h) # R < S
                 hm=$(( $h - $sr_high ))
             elif [ $h -lt $rs_low ]; then
                 hm=$(( 24 - $sr_high + $h ))
-            elif [ $rs_low -le $h ] && [ $h -lt $rs_high ]; then # gap_rs
-                hm=0
-            else # gap_sr
+            elif [ $rs_low -le $h ] && [ $h -le $rs_high ]; then # gap_rs
                 hm=$(( 24 - $sr_high + $rs_low ))
+            else # gap_sr
+                hm=0
             fi
             range=$(( 24 - $sr_high + $rs_low ))
         fi
@@ -587,6 +587,24 @@ test_calc_redshift() {
     assert is_sunset $is_sunset 1
     assert range $range 8
     assert p $p 0
+
+    echo calc_redshift 4 21 1 0 15 # big night gap
+    calc_redshift 4 21 1 0 15
+    assert RS $RS 12
+    assert SR $SR 0
+    assert hm $hm 0
+    assert is_sunset $is_sunset 0
+    assert range $range 4
+    assert p $p 0
+
+    echo calc_redshift 4 21 11 0 10 # big night gap
+    calc_redshift 4 21 11 0 10
+    assert RS $RS 12
+    assert SR $SR 0
+    assert hm $hm 6
+    assert is_sunset $is_sunset 0
+    assert range $range 7
+    assert p $p 85
 }
 
 
@@ -598,7 +616,7 @@ declare -ri TOO_MUCH_BLUE=30 # remove edge values if they are too red or too blu
 declare -i R=4 # ARAISE
 declare -i S=21 # SUNSET
 declare -i day_gap=0 # gap in the middle of the day
-declare -i night_gap=15 # gap in the middle of the night
+declare -i night_gap=10 # gap in the middle of the night
 
 
 do_redshift() {
@@ -621,7 +639,7 @@ do_redshift() {
 test_do_redshift() {
     for h in `seq 0 23`; do
         echo h $h
-        calc_redshift $R $S $h # calculate percentage of RED-BLUE according to time to "p" variable
+        calc_redshift $R $S $h $day_gap $night_gap # calculate percentage of RED-BLUE according to time to "p" variable
         redshift $p # adjust screen
         sleep 1
     done
