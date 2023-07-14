@@ -280,29 +280,62 @@ calc_redshift() { # (R, S, h) # R < S
 
     # ------ sunset or raising?
     # is_sunset=0 #? 1=RS SR, 0 = SR RS
+    # if [[ $RS -lt $SR ]]; then # RS < SR # RS_mday=12, SR_mnight=22
+    #     if [ $RS -lt $h ] && [ $h -lt $SR ]; then # RS < h < SR # RS_mday=12, SR_mnight=22, h=13
+    #         is_sunset=1
+    #         # echo SR - RS $SR - $RS
+    #         s_range=$(( $SR - $RS ))
+    #         hm=$(( $h - $RS ))
+    #     else # RS_mday=12, SR_mnight=22, h=23 or h=1
+    #         is_sunset=0
+    #         r_range=$(( $RS + (24 - $SR) ))
+    #         if [[ $h -gt $SR ]]; then # h > SR # h=23
+    #             hm=$(( $h - $SR ))
+    #         else # h=1
+    #             hm=$(( (24 - $SR) + $h ))
+    #         fi
+    #     fi
+    # elif [[ $RS -gt $SR ]]; then # RS > $SR # SR_mnight=2, RS_mday=12
+    #     if [ $RS -gt $h ] && [ $h -gt $SR ]; then # RS > h > SR # SR_mnight=2, RS_mday=12, h=3
+    #         is_sunset=0
+    #         r_range=$(( $RS - $SR ))
+    #         hm=$(( $h - $SR ))
+    #     else # SR_mnight=2, RS_mday=12, h=14 or h=1
+    #         is_sunset=1
+    #         # echo SR + 24 - RS $SR + 24 - $RS
+    #         s_range=$(( $SR + (24 - $RS) ))
+    #         if [[ $h -gt $RS ]]; then # h > RS # h=14
+    #             hm=$(( $h - $RS ))
+    #         else # h=1
+    #             hm=$(( (24 - $RS) + $h ))
+    #         fi
+    #     fi
+    # fi
+
+    # ------ sunset or raising?
+    # is_sunset=0 #? 1=RS SR, 0 = SR RS
     if [[ $RS -lt $SR ]]; then # RS < SR # RS_mday=12, SR_mnight=22
         if [ $RS -lt $h ] && [ $h -lt $SR ]; then # RS < h < SR # RS_mday=12, SR_mnight=22, h=13
             is_sunset=1
-            # echo SR - RS $SR - $RS
-            s_range=$(( $SR - $RS ))
-            hm=$(( $h - $RS ))
         else # RS_mday=12, SR_mnight=22, h=23 or h=1
             is_sunset=0
-            r_range=$(( $RS + (24 - $SR) ))
-            if [[ $h -gt $SR ]]; then # h > SR # h=23
-                hm=$(( $h - $SR ))
-            else # h=1
-                hm=$(( (24 - $SR) + $h ))
-            fi
         fi
     elif [[ $RS -gt $SR ]]; then # RS > $SR # SR_mnight=2, RS_mday=12
         if [ $RS -gt $h ] && [ $h -gt $SR ]; then # RS > h > SR # SR_mnight=2, RS_mday=12, h=3
             is_sunset=0
-            r_range=$(( $RS - $SR ))
-            hm=$(( $h - $SR ))
         else # SR_mnight=2, RS_mday=12, h=14 or h=1
             is_sunset=1
-            # echo SR + 24 - RS $SR + 24 - $RS
+        fi
+    fi
+    # is_sunset
+
+    # --------------- two ranges and current hour in range
+    if [ $is_sunset -eq 1 ] ; then
+        if [[ $RS -lt $SR ]]; then # RS < h < SR # RS_mday=12, SR_mnight=22, h=13
+            # echo SR - RS $SR - $RS
+            s_range=$(( $SR - $RS ))
+            hm=$(( $h - $RS ))
+        else # SR_mnight=2, RS_mday=12, h=14 or h=1
             s_range=$(( $SR + (24 - $RS) ))
             if [[ $h -gt $RS ]]; then # h > RS # h=14
                 hm=$(( $h - $RS ))
@@ -310,7 +343,32 @@ calc_redshift() { # (R, S, h) # R < S
                 hm=$(( (24 - $RS) + $h ))
             fi
         fi
+    else # is_sunset == 0
+        if [[ $RS -gt $SR ]]; then # RS > h > SR # SR_mnight=2, RS_mday=12, h=3
+            r_range=$(( $RS - $SR ))
+            hm=$(( $h - $SR ))
+        else # RS_mday=12, SR_mnight=22, h=23 or h=1
+            r_range=$(( $RS + (24 - $SR) ))
+            if [[ $h -gt $SR ]]; then # h > SR # h=23
+                hm=$(( $h - $SR ))
+            else # h=1
+                hm=$(( (24 - $SR) + $h ))
+            fi
+        fi
     fi
+
+
+
+
+
+
+
+
+
+
+
+
+
     # echo is_sunset $is_sunset
     # ------- select colorramp index 0-100
     if [[ is_sunset -eq 1 ]]; then
