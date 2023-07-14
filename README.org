@@ -1,10 +1,11 @@
 * Description
-Change screen from red to blue according to current time or manually.
+Change screen from red to blue temperature color according to current
+ time or manually.
 
 It takes arise and sunset time and calc middle of the day. Then calc
  if it is going to be sunset or it is going to be arise according to
  current time. Color changes from middle of the day to middle of the
- night and reverse.
+ night and reverse by hours.
 
 At the middle of the day it makes screen blue and at the middle of the
  night red.
