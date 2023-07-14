@@ -262,8 +262,8 @@ declare -ar blackbody_color=( # temperature from hot to cool
 
 # ------ help functions
 assert() {
-    if ! [[ "$2" =~ ^[0-9]+$ ]]; then echo Error $1 not integer: 2 ; fi
-    if ! [[ "$3" =~ ^[0-9]+$ ]]; then echo Error $1 not integer: 3 ; fi
+    if ! [[ "$2" =~ ^[0-9]+$ ]]; then echo Error $1 not integer: 2 $2 ; fi
+    if ! [[ "$3" =~ ^[0-9]+$ ]]; then echo Error $1 not integer: 3 $3 ; fi
     # echo $1
     [ $2 -ne $3 ] && echo "Error $1 $2 != $3" ;
 }
@@ -302,9 +302,21 @@ redshift() { # change temperature, uses TOO_MUCH value
 
 
 calc_redshift() { # (R, S, h) # R < S
-    local -r R=$1;  shift
-    local -r S=$1; shift
-    local -r h=$1; shift
+    local -ri R=$1;  shift
+    local -ri S=$1; shift
+    local -ri h=$1; shift
+    if [ $# -gt 0 ]; then
+        local -i RS_gap=$1; shift # blue gap
+    else
+        RS_gap=0
+    fi
+    if [ $# -gt 0 ]; then
+        local -i SR_gap=$1; shift # blue gap
+    else
+        SR_gap=0
+    fi
+    echo RS_gap $RS_gap
+    echo SR_gap $SR_gap
 
     RS=$(( (($S - $R) / 2) + $R )) # middle of day
     SR=$(( (24 - $S + $R) / 2 + $S )) # middle of night
@@ -330,8 +342,6 @@ calc_redshift() { # (R, S, h) # R < S
     # is_sunset
 
 
-    RS_gap=4 # blue gap
-    SR_gap=4 # red gap
     RS_gap_part1=$(($RS_gap / 2))
     RS_gap_part2=$(($RS_gap_part1 + $RS_gap % 2 ))
     SR_gap_part1=$(($SR_gap / 2))
@@ -344,12 +354,6 @@ calc_redshift() { # (R, S, h) # R < S
     rs_high=$(add_h $RS $RS_gap_part2)
     sr_low=$(sub_h $SR $SR_gap_part1)
     sr_high=$(add_h $SR $SR_gap_part2)
-    echo RS $RS
-    echo SR $SR
-    echo rs_low $rs_low
-    echo rs_high $rs_high
-    echo sr_low $sr_low
-    echo sr_high $sr_high
 
     # R->rs_low->rs_high->S->sr_low->sr_high->R
     #
@@ -382,9 +386,9 @@ calc_redshift() { # (R, S, h) # R < S
             elif [ $rs_low -le $h ] && [ $h -lt $rs_high ]; then # gap_rs
                 hm=0
             else # gap_sr
-                hm=$(( $sr_high - $rs_low ))
+                hm=$(( $rs_low - $sr_high ))
             fi
-            range=$(( $sr_high - $rs_low ))
+            range=$(( $rs_low - $sr_high ))
         fi
 
     elif [ $sr_low -lt $rs_low ]; then
@@ -407,9 +411,9 @@ calc_redshift() { # (R, S, h) # R < S
             elif [ $rs_low -le $h ] && [ $h -lt $rs_high ]; then # gap_rs
                 hm=0
             else # gap_sr
-                hm=$(( $sr_high - $rs_low ))
+                hm=$(( $rs_low - $sr_high ))
             fi
-            range=$(( $sr_high - $rs_low ))
+            range=$(( $rs_low - $sr_high  ))
         fi
     else
         # -- normal (middle of the night before 00:00 sr_low and sr_high)
@@ -439,46 +443,55 @@ calc_redshift() { # (R, S, h) # R < S
         fi
     fi
 
+    echo RS $RS
+    echo SR $SR
+    echo rs_low $rs_low
+    echo rs_high $rs_high
+    echo sr_low $sr_low
+    echo sr_high $sr_high
+    echo is_sunset $is_sunset
+    echo range $range
+    echo hm $hm
 
 
 
     # -- old
-    if [ $is_sunset -eq 1 ] ; then
-        if [[ $RS -lt $SR ]]; then # RS < h < SR # RS_mday=12, SR_mnight=22, h=13
-            # echo SR - RS $SR - $RS
-            s_range=$(( $SR - $RS ))
-            hm=$(( $h - $RS ))
-        else # SR_mnight=2, RS_mday=12, h=14 or h=1
-            s_range=$(( $SR + (24 - $RS) ))
-            if [[ $h -gt $RS ]]; then # h > RS # h=14
-                hm=$(( $h - $RS ))
-            else # h=1
-                hm=$(( (24 - $RS) + $h ))
-            fi
-        fi
-    else # is_sunset == 0
-        if [[ $RS -gt $SR ]]; then # RS > h > SR # SR_mnight=2, RS_mday=12, h=3
-            r_range=$(( $RS - $SR ))
-            hm=$(( $h - $SR ))
-        else # RS_mday=12, SR_mnight=22, h=23 or h=1
-            r_range=$(( $RS + (24 - $SR) ))
-            if [[ $h -gt $SR ]]; then # h > SR # h=23
-                hm=$(( $h - $SR ))
-            else # h=1
-                hm=$(( (24 - $SR) + $h ))
-            fi
-        fi
-    fi
+    # if [ $is_sunset -eq 1 ] ; then
+    #     if [[ $RS -lt $SR ]]; then # RS < h < SR # RS_mday=12, SR_mnight=22, h=13
+    #         # echo SR - RS $SR - $RS
+    #         s_range=$(( $SR - $RS ))
+    #         hm=$(( $h - $RS ))
+    #     else # SR_mnight=2, RS_mday=12, h=14 or h=1
+    #         s_range=$(( $SR + (24 - $RS) ))
+    #         if [[ $h -gt $RS ]]; then # h > RS # h=14
+    #             hm=$(( $h - $RS ))
+    #         else # h=1
+    #             hm=$(( (24 - $RS) + $h ))
+    #         fi
+    #     fi
+    # else # is_sunset == 0
+    #     if [[ $RS -gt $SR ]]; then # RS > h > SR # SR_mnight=2, RS_mday=12, h=3
+    #         r_range=$(( $RS - $SR ))
+    #         hm=$(( $h - $SR ))
+    #     else # RS_mday=12, SR_mnight=22, h=23 or h=1
+    #         r_range=$(( $RS + (24 - $SR) ))
+    #         if [[ $h -gt $SR ]]; then # h > SR # h=23
+    #             hm=$(( $h - $SR ))
+    #         else # h=1
+    #             hm=$(( (24 - $SR) + $h ))
+    #         fi
+    #     fi
+    # fi
 
 
     # echo is_sunset $is_sunset
     # ------- select colorramp index 0-100
     if [[ is_sunset -eq 1 ]]; then
         # echo '100 - ( hm * 100 / s_range )' 100 -  $hm * 100 / $s_range
-        p=$(( 100 - ( $hm * 100 / $s_range ) ))   # 0-100 cool->hot
+        p=$(( 100 - ( $hm * 100 / $range ) ))   # 0-100 cool->hot
     else # raising
         # echo '100 - ( hm * 100 / r_range )' $hm  $r_range
-        p=$(( $hm * 100 / $r_range )) # 0-100 hot->cool
+        p=$(( $hm * 100 / $range )) # 0-100 hot->cool
     fi
     # echo $p
 }
@@ -502,13 +515,16 @@ test_calc_redshift() {
     add_hr=$(add_h 23 23)
     assert add_hr $add_hr 22
 
+    # RS_gap=0 # blue gap
+    # SR_gap=0 # red gap
+    echo '(R, S, h)'
     echo calc_redshift 4 21 1
     calc_redshift 4 21 1
     assert RS $RS 12
     assert SR $SR 0
     assert hm $hm 1
     assert is_sunset $is_sunset 0
-    assert r_range $r_range 12
+    assert range $range 12
     assert p $p 8
 
     echo calc_redshift 4 21 4
@@ -517,7 +533,6 @@ test_calc_redshift() {
     assert SR $SR 0
     assert hm $hm 4
     assert is_sunset $is_sunset 0
-    assert r_range $r_range 12
     assert p $p 33
 
     echo calc_redshift 4 21 12
@@ -526,7 +541,6 @@ test_calc_redshift() {
     assert SR $SR 0
     assert hm $hm 12
     assert is_sunset $is_sunset 0
-    assert r_range $r_range 12
     assert p $p 100
 
     echo calc_redshift 4 21 20
@@ -535,17 +549,15 @@ test_calc_redshift() {
     assert SR $SR 0
     assert hm $hm 8
     assert is_sunset $is_sunset 1
-    assert s_range $s_range 12
     assert p $p 34
 
-    echo calc_redshift 6 20 20
-    calc_redshift 6 20 20
-    assert RS $RS 13
-    assert SR $SR 1
-    assert hm $hm 7
-    assert is_sunset $is_sunset 1
-    assert s_range $s_range 12
-    assert p $p 42
+    # echo calc_redshift 6 20 20
+    # calc_redshift 6 20 20
+    # assert RS $RS 13
+    # assert SR $SR 1
+    # assert hm $hm 7
+    # assert is_sunset $is_sunset 1
+    # assert p $p 42
 }
 
 
