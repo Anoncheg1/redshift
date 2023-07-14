@@ -9,8 +9,8 @@ set -E
 
 # require https://www.x.org/wiki/Projects/XRandR/
 # 1) set R and S values
-# 2) exec do_redshift
-# 3) or exec redshift 0-100 or normal
+# 2) eval do_redshift
+# 3) or eval redshift 0-100 or normal
 
 # https://github.com/jonls/redshift/blob/master/src/colorramp.c
 # https://github.com/jonls/redshift/blob/master/README-colorramp
