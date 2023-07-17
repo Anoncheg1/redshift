@@ -1,11 +1,13 @@
 #!/usr/bin/env bash
 
-set -u # Report Non-Existent Variables
-set -E
-# set -e # It terminates the execution when the error occurs. (does not work with piped commands. use Set -eo pipefail)
+# debug
+# set -u # Report Non-Existent Variables
+# set -E # If set, the ERR trap is inherited by shell functions.
+# # # set -e # It terminates the execution when the error occurs. (does not work with piped commands. use Set -eo pipefail)
 # set -o pipefail # exit execution if one of the commands in the pipe fails.
-# set -x # write to standard error a trace for each  command
-# set -n # do not execute only check syntax
+# # # set -x # write to standard error a trace for each  command
+# # # set -n # do not execute only check syntax
+# trap 'echo $? $LINENO :${BASH_LINENO[@]} "$BASH_COMMAND" ::${FUNCNAME[@]}' ERR
 
 # require https://www.x.org/wiki/Projects/XRandR/
 # 1) set R and S values
@@ -15,7 +17,7 @@ set -E
 # https://github.com/jonls/redshift/blob/master/src/colorramp.c
 # https://github.com/jonls/redshift/blob/master/README-colorramp
 # Ingo Thies, 2013
-declare -ar blackbody_color=( # temperature from hot to cool
+declare -a blackbody_color=( # temperature from hot to cool
 	1.00000000:0.18172716:0.00000000 # /* 1000K */
 	1.00000000:0.25503671:0.00000000 # /* 1100K */
 	1.00000000:0.30942099:0.00000000 # /* 1200K */
@@ -264,8 +266,8 @@ declare -ar blackbody_color=( # temperature from hot to cool
 assert() {
     if ! [[ "$2" =~ ^[0-9]+$ ]]; then echo Error $1 not integer: 2 $2 ; fi
     if ! [[ "$3" =~ ^[0-9]+$ ]]; then echo Error $1 not integer: 3 $3 ; fi
-    # echo $1
-    [ $2 -ne $3 ] && echo "Error $1 $2 != $3" ;
+    if [ $2 -ne $3 ]; then echo "Error $1 $2 != $3" ; fi
+    [ $2 -ne $3 ] && echo wtf
 }
 
 sub_h() { # (h, sub) -> hsub
@@ -580,18 +582,18 @@ test_calc_redshift() {
 
 # ----------- MAIN -----------
 
-declare -ri TOO_MUCH_RED=1  # remove edge values if they are too red or too blue
-declare -ri TOO_MUCH_BLUE=30 # remove edge values if they are too red or too blue # max 242 for sum
+declare -i TOO_MUCH_RED=1  # remove edge values if they are too red or too blue
+declare -i TOO_MUCH_BLUE=160 # remove edge values if they are too red or too blue # max 242 for sum
 # must be: R < S
-declare -i R=4 # ARAISE
-declare -i S=21 # SUNSET
+declare -i R=2 # ARAISE
+declare -i S=19 # SUNSET
 declare -i day_gap=0 # gap in the middle of the day
 declare -i night_gap=10 # gap in the middle of the night
 
 
 do_redshift() {
     h=$(date +%k) # get current hour
-    # h=$(TZ="Europe/Parish" date +%k) # variant with timezone
+    # h=$(TZ="Europe/Paris" date +%k) # variant with timezone
     calc_redshift $R $S $h $day_gap $night_gap # calculate percentage of RED-BLUE according to time to "p" variable
     redshift $p # adjust screen
 }
