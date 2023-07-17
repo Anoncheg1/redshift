@@ -267,7 +267,6 @@ assert() {
     if ! [[ "$2" =~ ^[0-9]+$ ]]; then echo Error $1 not integer: 2 $2 ; fi
     if ! [[ "$3" =~ ^[0-9]+$ ]]; then echo Error $1 not integer: 3 $3 ; fi
     if [ $2 -ne $3 ]; then echo "Error $1 $2 != $3" ; fi
-    [ $2 -ne $3 ] && echo wtf
 }
 
 sub_h() { # (h, sub) -> hsub
