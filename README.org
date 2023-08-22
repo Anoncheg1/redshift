@@ -57,12 +57,8 @@ Check that xrandr exist at PATH:
 xrandr
 #+end_src
 * Usage
-First set variables R and S inside of the script
- https://github.com/Anoncheg1/redshift/blob/main/redshift.sh#L586
- This is time of raising and sunset. You can get this values at
- internet according to your region and season.
 
-Second you should execute script to shell:
+Execute script to shell:
 #+begin_src bash
 source /home/user/git_cloned_sources/redshift/redshift.sh
 #+end_src
@@ -90,6 +86,18 @@ test_do_redshift
 
 If at the middle of the day BLUE is too active you can decrease it with increasing value of TOO_MUCH_BLUE, same for red.
 
+* Configuration
+Set variables R and S inside of the script
+ https://github.com/Anoncheg1/redshift/blob/main/redshift.sh#L586
+ This is time of raising and sunset. You can get this values at
+ internet according to your region and season.
+
+#+begin_src bash
+declare -i R=2 # ARAISE - 2:00 time of sun rising
+declare -i S=19 # SUNSET - 19:00 time of sunset
+declare -i day_gap=0 # gap in the middle of the day
+declare -i night_gap=10 # gap in the middle of the night when it is always red
+#+end_src
 * Automatic activation
 You can activate command when you do other frequently used commands:
 #+begin_src bash
