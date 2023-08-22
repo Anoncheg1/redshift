@@ -1,3 +1,4 @@
+![demo](https://fedoramagazine.org/wp-content/uploads/2017/01/screenshot1.png)
 * Description
 Change screen from red to blue temperature color according to current
  time or manually.
