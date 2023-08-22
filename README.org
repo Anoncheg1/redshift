@@ -96,15 +96,6 @@ You can activate command when you do other frequently used commands:
 alias ls="do_redshift ; ls"
 #+end_src
 
-Or create process when you first open Bash, add this lines to *~/.bashrc* file:
-#+begin_src bash
-ra=$(ps aux | grep 'watch -n' | wc -l)
-if [ $ra -eq 1 ] ; then
-    source /home/user/git_cloned_sources/redshift/redshift.sh
-    watch -n $((60*60)) "$(do_redshift)" >/dev/null &
-fi
-#+end_src
-
 Or add command to *Cron* daemon with hour period:
 #+begin_src bash
 sudo cron -e
